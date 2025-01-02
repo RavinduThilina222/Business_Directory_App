@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import Login from './../components/LoginScreen'; // Import the LoginScreen component
 import { ClerkProvider, ClerkLoaded, SignedIn, SignedOut } from '@clerk/clerk-expo';
 import { Slot } from 'expo-router';
+import Home from './(tabs)/home.jsx';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -25,7 +26,7 @@ export default function RootLayout() {
       <ClerkLoaded>
         <SignedIn>
           <View>
-            <Text>Signed In</Text>
+            <Home/>
             <Slot />
           </View>
         </SignedIn>

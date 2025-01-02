@@ -1,14 +1,44 @@
-import { View, Text,Image, TouchableOpacity } from 'react-native';
+import { View, Text,Image, TouchableOpacity, Platform } from 'react-native';
 import React from 'react';
+import { useOAuth } from '@clerk/clerk-expo';
 import { StyleSheet } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import { useWarmUpBrowser } from './../hooks/useWarmUpBrower.jsx';
+import * as Linking from 'expo-linking';
+
+
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Login() {
+  if (Platform.OS !== 'web') {
+    useWarmUpBrowser();
+  }
+
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
+
+  const onPress = React.useCallback(async () => {
+    try {
+      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow({
+        redirectUrl: Linking.createURL('/home', { scheme: 'myapp' }),
+      });
+
+      if (createdSessionId) {
+        setActive({ session: createdSessionId });
+      } else {
+        // Use signIn or signUp for next steps such as MFA
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [startOAuthFlow]);
+
   return (
     <View>
         <View style={{
             display:'flex',
             alignItems:'center',
-            marginTop:60,
+            marginTop:50,
         }}>
       <Image source={require('./../assets/images/login.png')} 
         style={{
@@ -35,7 +65,8 @@ export default function Login() {
             marginVertical:15,
             color:'#8f8f8f'
         }}>Find your favorite business near your and post you own business to your commmunity</Text>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity style={styles.btn}
+        onPress={onPress}>
             <Text style={{
                 textAlign:'center',
                 color:'#fff',
